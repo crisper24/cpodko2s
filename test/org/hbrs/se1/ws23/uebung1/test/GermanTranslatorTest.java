@@ -10,7 +10,21 @@ class GermanTranslatorTest {
     @Test
     void aPositiveTest() {
         GermanTranslator translator = new GermanTranslator();
+        String value = translator.translateNumber(4);
+        assertEquals(value, "vier");
+    }
+
+    @Test
+    void aNegativeTest() {
+        GermanTranslator translator = new GermanTranslator();
         String value = translator.translateNumber(0);
-        assertEquals(value, "null");
+        assertEquals(value, "Übersetzung der Zahl 0 nicht möglich (Version: 1.0)");
+    }
+
+    @Test
+    void bNegativeTest() {
+        GermanTranslator translator = new GermanTranslator();
+        String value = translator.translateNumber(100);
+        assertEquals(value, "Übersetzung der Zahl 100 nicht möglich (Version: 1.0)");
     }
 }
