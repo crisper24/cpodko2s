@@ -68,7 +68,7 @@ public class ContainerTest {
         container.addMember(member2);
         Assertions.assertEquals(2, container.size());
         String result = container.deleteMember(3);
-        Assertions.assertEquals("Kein Member mit der ID [3] vorhanden.", result);
+        Assertions.assertEquals("Es existiert kein Member mit der ID: 3", result);
     }
 
     @Test
