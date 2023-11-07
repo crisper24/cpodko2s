@@ -14,9 +14,12 @@ public class Container {
 	 * bei der Bewahrung der Konsistenz vom Key und Value (siehe TestStore, letzter Test)
 	 */
 	private List<Member> liste = new ArrayList<Member>();
-	
-	
-	/*
+
+    public static Container getInstance() {
+    }
+
+
+    /*
 	 * Methode zum Hinzufuegen einer Member.
 	 * @throws ContainerException
 	 */ 

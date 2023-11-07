@@ -1,11 +1,20 @@
 package org.hbrs.se1.ws23.uebung3.persistence;
 
+import org.hbrs.se1.ws23.solutions.uebung2.Member;
+
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
-public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
+public class PersistenceStrategyStream<E> implements PersistenceStrategy<Member> {
 
     // URL of file, in which the objects are stored
     private String location = "objects.ser";
+    private ObjectInputStream ois;
+    private FileInputStream fis;
+    private ObjectOutputStream oos;
+    private FileOutputStream fos;
+    private List<Member> newList = new ArrayList<>();
 
     // Backdoor method used only for testing purposes, if the location should be changed in a Unit-Test
     // Example: Location is a directory (Streams do not like directories, so try this out ;-)!
@@ -20,7 +29,12 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
      * and save.
      */
     public void openConnection() throws PersistenceException {
-
+        try {
+            oos = new ObjectOutputStream(new FileOutputStream(location));
+            ois = new ObjectInputStream(new FileInputStream(location));
+        } catch (IOException e) {
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable, "Fehler beim Öffnen der Dateiverbindung.");
+        }
     }
 
     @Override
@@ -28,15 +42,31 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
      * Method for closing the connections to a stream
      */
     public void closeConnection() throws PersistenceException {
-
+        try {
+            if (oos != null) {
+                oos.close();
+            }
+            if (ois != null) {
+                ois.close();
+            }
+        } catch (IOException e) {
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable, "Fehler beim Schließen der Dateiverbindung.");
+        }
     }
 
     @Override
     /**
      * Method for saving a list of Member-objects to a disk (HDD)
      */
-    public void save(List<E> member) throws PersistenceException  {
-
+    public void save(List<Member> member) throws PersistenceException  {
+        try {
+            if (oos == null) {
+                throw new PersistenceException(PersistenceException.ExceptionType.NoStrategyIsSet, "Dateiverbindung nicht geöffnet.");
+            }
+            oos.writeObject(member);
+        } catch (IOException e) {
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable,"Fehler beim Speichern der Daten.");
+        }
     }
 
     @Override
@@ -45,7 +75,7 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
      * Some coding examples come for free :-)
      * Take also a look at the import statements above ;-!
      */
-    public List<E> load() throws PersistenceException  {
+    public List<Member> load() throws PersistenceException  {
         // Some Coding hints ;-)
 
         // ObjectInputStream ois = null;
@@ -66,6 +96,14 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
         // return newListe
 
         // and finally close the streams (guess where this could be...?)
-        return null;
+
+        try {
+            if (ois == null) {
+                throw new PersistenceException(PersistenceException.ExceptionType.ImplementationNotAvailable, "Dateiverbindung nicht geöffnet.");
+            }
+            return (List<Member>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable, "Fehler beim Laden der Daten.");
+        }
     }
 }
